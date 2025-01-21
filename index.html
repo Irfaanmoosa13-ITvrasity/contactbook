@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Book</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Contact Book</h1>
+
+    <form id="contactForm">
+        <input type="text" id="name" placeholder="Name" required>
+        <input type="text" id="phone" placeholder="Phone (e.g. 123-456-7890)" required>
+        <button type="submit">Add Contact</button>
+    </form>
+
+    <h3>Contacts</h3>
+    <ul id="contacts"></ul>
+
+    <script>
+        // Retrieve stored contacts from localStorage, or initialize as an empty array
+        const contacts = JSON.parse(localStorage.getItem('contacts')) || [];
+
+        // Function to display contacts
+        function displayContacts() {
+            const contactsList = document.getElementById('contacts');
+            contactsList.innerHTML = ''; // Clear existing list
+
+            contacts.forEach((contact, index) => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${contact.name} - ${contact.phone}`;
+                listItem.innerHTML += ` <button onclick="deleteContact(${index})">Delete</button>`;
+                contactsList.appendChild(listItem);
+            });
+        }
+
+        // Add a contact on form submission
+        document.getElementById('contactForm').addEventListener('submit', function (e) {
+            e.preventDefault(); // Prevent page reload
+
+            const name = document.getElementById('name').value;
+            let phone = document.getElementById('phone').value;
+
+            // Validate phone number format (basic validation: digits and optional dashes/spaces)
+            const phoneRegex = /^[0-9\s\-()]+$/; // Allow numbers, spaces, dashes, and parentheses
+            if (!phoneRegex.test(phone)) {
+                alert('Please enter a valid phone number format.');
+                return;
+            }
+
+            // Add the new contact
+            contacts.push({ name, phone });
+
+            // Save contacts to localStorage
+            localStorage.setItem('contacts', JSON.stringify(contacts));
+
+            // Clear the input fields
+            document.getElementById('name').value = '';
+            document.getElementById('phone').value = '';
+
+            // Update the displayed contact list
+            displayContacts();
+        });
+
+        // Function to delete a contact
+        function deleteContact(index) {
+            contacts.splice(index, 1); // Remove the contact at the specified index
+
+            // Save the updated contacts to localStorage
+            localStorage.setItem('contacts', JSON.stringify(contacts));
+
+            // Update the contact list
+            displayContacts();
+        }
+
+        // Display contacts on page load
+        displayContacts();
+    </script>
+</body>
+</html>
